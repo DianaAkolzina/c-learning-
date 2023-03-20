@@ -1,0 +1,34 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+
+int main() {
+    std::vector<std::string> filenames = {"file1.csv", "file2.csv", "file3.csv", "file4.csv"};
+    std::vector<std::vector<double>> data;
+
+    for (const auto& filename : filenames) {
+        std::ifstream file(filename);
+        std::vector<double> row;
+        std::string line;
+
+        while (std::getline(file, line)) {
+            std::stringstream ss(line);
+            double value;
+
+            while (ss >> value) {
+                row.push_back(value);
+
+                if (ss.peek() == ',') {
+                    ss.ignore();
+                }
+            }
+        }
+
+        data.push_back(row);
+    }
+
+    // Your plotting code here
+    // ...
+    return 0;
+}
