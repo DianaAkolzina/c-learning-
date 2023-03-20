@@ -1,0 +1,71 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <cmath>
+#include <random>
+#include <algorithm>
+
+#include "matplotlibcpp.h"
+
+namespace plt = matplotlibcpp;
+using namespace std;
+
+int main()
+{
+    // Fixing random state for reproducibility
+    std::mt19937 gen(13);
+    std::uniform_real_distribution<double> distr(-2.0, 2.0);
+
+    std::vector<std::string> names = {"data1.csv", "data2.csv", "data3.csv", "data4.csv"};
+
+    plt::cmap cmap = plt::get_cmap("Set2");
+    plt::cmap cmap2 = plt::get_cmap("Set3");
+    std::vector< std::vector<double> > colors = cmap.colors();
+    std::vector< std::vector<double> > colors2 = cmap2.colors();
+
+    std::vector<std::string> titles = {"m12", "m13", "m14", "m21", "m22", "m23", "m24", "m31", "m32", "m33", "m34"};
+
+    std::vector<std::vector<double>> all_data;
+
+    for (int index = 0; index < 4; index++) {
+        std::vector<double> data;
+        std::ifstream file(names[index]);
+        std::string line;
+        while (std::getline(file, line)) {
+            std::stringstream ss(line);
+            std::string item;
+            while (std::getline(ss, item, ',')) {
+                data.push_back(std::stod(item));
+            }
+        }
+        file.close();
+
+        for (size_t i = 4; i < data.size(); i++) {
+            data[i] = std::stod(std::to_string(distr(gen)).substr(0, 5));
+        }
+
+        all_data.push_back(data);
+    }
+
+    plt::figure();
+    plt::subplots(3, 4, false, false, {12, 16});
+
+    for (int index = 0; index < 4; index++) {
+        std::vector<double> data = all_data[index];
+
+        for (int j = 0; j < 11; j++) {
+            plt::subplot(3, 4, j+1);
+            plt::plot(std::vector<double>(data.begin() + 4, data.end()), std::vector<double>(data.begin() + (j*2) + 7, data.begin() + (j*2) + 9), {{"color", colors[index]}, {"label", std::to_string(std::round(50 + (15.0/3.0*index))) + " deg"}});
+            plt::title(titles[j]);
+            plt::ylim(-2, 2);
+        }
+
+        plt::subplot(3, 4, 2);
+        plt::legend({"upper left"});
+    }
+
+    plt::show();
+    return 0;
+}
